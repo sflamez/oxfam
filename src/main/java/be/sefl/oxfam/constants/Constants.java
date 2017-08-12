@@ -6,7 +6,9 @@ package be.sefl.oxfam.constants;
 public class Constants {
 	
 	/** Printing constants. */
-	public static final String EURO = " \u20AC";
+	public static final String SERVER_PROPERTY = "runsAsOxfamServer";
+	public static final int SERVER_PORT = 9999;
+	public static final String EURO = " €";
 	public static final String ESC = ((char) 0x1b) + "";
 	public static final String LF = ((char) 0x0a) + "";
 	public static final String SPACES = "                                                                      ";
