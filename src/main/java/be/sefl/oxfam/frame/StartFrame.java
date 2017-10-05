@@ -9,12 +9,14 @@ import java.awt.event.WindowListener;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import be.sefl.oxfam.utilities.HelpMethods;
+import be.sefl.oxfam.utilities.PrintServer;
 
 /**
  * @author sefl
