@@ -5,8 +5,14 @@ import be.sefl.oxfam.object.Order;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class PrinterThread extends Thread {
-    private Socket socket;
+
+	private static final Logger logger = LoggerFactory.getLogger("PrinterThread");
+
+	private Socket socket;
 
     public PrinterThread(Socket socket) {
         super("PrinterThread");
@@ -17,9 +23,9 @@ public class PrinterThread extends Thread {
         try {
             ObjectInputStream inputStream = new ObjectInputStream(this.socket.getInputStream());
             Order order = (Order) inputStream.readObject();
-            System.out.println("Received an order:");
-            System.out.println(order);
-            System.out.println("Trying to print order...");
+            logger.info("Received an order:");
+            logger.info(order.toString());
+            logger.info("Trying to print order...");
             Printer.print(order);
             inputStream.close();
             this.socket.close();

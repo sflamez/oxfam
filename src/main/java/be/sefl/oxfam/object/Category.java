@@ -50,12 +50,16 @@ public class Category {
 		this.articles.add(article);
 	}
 	
+	public void addArticles(List<Article> articles) {
+		this.articles.addAll(articles);
+	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
 	
 	public String toString() {
-		String ret = "Category " + name + " contains:" + Constants.NEWLINE;
+		String ret = "Category " + name + " (ID = " + ID + ") contains:" + Constants.NEWLINE;
 		for (int i = 0; i < this.articles.size(); i++) {
 			ret += "\t"+ this.articles.get(i) + Constants.NEWLINE;
 		}
@@ -72,4 +76,9 @@ public class Category {
 		Category cat = (Category) obj;
 		return this.name.equals(cat.name);
 	}
+
+	public boolean isLeeggoed() {
+		return this.name.equals("Leeggoed");
+	}
+
 }

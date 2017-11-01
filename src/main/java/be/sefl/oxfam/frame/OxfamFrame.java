@@ -12,13 +12,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -32,6 +25,9 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.CompoundBorder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.sefl.oxfam.border.ClickableTitledBorder;
 import be.sefl.oxfam.constants.Constants;
 import be.sefl.oxfam.constants.EuroLabel;
@@ -39,6 +35,7 @@ import be.sefl.oxfam.object.Article;
 import be.sefl.oxfam.object.Category;
 import be.sefl.oxfam.object.Order;
 import be.sefl.oxfam.panel.OxfamJPanel;
+import be.sefl.oxfam.utilities.Database;
 import be.sefl.oxfam.utilities.HelpMethods;
 import be.sefl.oxfam.utilities.Printer;
 
@@ -49,6 +46,8 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 
 	private static final long serialVersionUID = 7743524114756854696L;
 
+	private static final Logger logger = LoggerFactory.getLogger("OxfamFrame");
+	
 	// ---------- Panels ----------\\
 	private static JPanel mainPanel;
 	private static JPanel[] helpPanelsArti, helpPanelsAmni, helpPanelsGiftsOut,	helpPanelsGiftsIn, helpPanelsReduc;
@@ -88,14 +87,10 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 	private static List<Category> categories;
 	private static double startAmount, kassaAmount;
 	private static Order order, totalOrder;
-	private static int idxCatEmpty;
+	private static Category emptyBottlesCategory;
 	private static int nbrOfArticles;
 
-	// ---------- Database properties ----------\\
-	private final static String PAR_FILE = "OxfamDB.mdb";
-	private final static String PAR_DRIVER = "sun.jdbc.odbc.JdbcOdbcDriver";
-	public final static String PAR_JDBC_URL = "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ="	+ PAR_FILE;
-//	public final static String PAR_JDBC_URL = "jdbc:odbc:oxfam";
+	private static Database database;
 
 	public OxfamFrame(String title) {
 		super(title, null, true);
@@ -126,16 +121,28 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 			}
 		});
 
-		categories = new ArrayList<Category>();
+		database = new Database();
 
-		readDB();
+		try {
+			categories = database.getCategories();
+			for (Category category : categories) {
+				if (category.isLeeggoed()) {
+					emptyBottlesCategory = category;
+				}
+				List<Article> articles = database.getArticles(category);
+				category.addArticles(articles);
+				nbrOfArticles += articles.size();
+			}
+		} catch (Exception e) {
+			logger.error("Problem reading from DB", e);
+		}
 
 		order = new Order();
 		totalOrder = new Order();
 
 		prodLabels = new JLabel[categories.size()][];
 		priceLabels = new JLabel[categories.size()][];
-		emptyBack = new JTextField[categories.get(idxCatEmpty).getArticleCount()];
+		emptyBack = new JTextField[emptyBottlesCategory.getArticleCount()];
 		sellCount = new JTextField[categories.size()][];
 		panels = new OxfamJPanel[categories.size() + 1];
 		helpPanels = new JPanel[categories.size()][2];
@@ -187,12 +194,6 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 	}
 
 	public static void init(double amount, boolean collapse) {
-		try {
-			Class.forName(PAR_DRIVER);
-		} catch (ClassNotFoundException e) {
-			System.out.println("Driver not found!");
-		}
-
 		programStart = true;
 		collapseCategories = collapse;
 		kassaAmount = startAmount = amount;
@@ -208,22 +209,15 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 
 	private void createArtikelPanels() {
 		for (int i = 0; i < categories.size(); i++) {
-			List<Article> articles = categories.get(i).getArticles();
+			Category category = categories.get(i);
+			List<Article> articles = category.getArticles();
 			int aantalArtikels = articles.size();
 
 			panels[i] = new OxfamJPanel(new GridLayout(1, 2), this);
 			panels[i].setBorder(BorderFactory.createCompoundBorder(new ClickableTitledBorder(categories.get(i).getName()), BorderFactory.createEmptyBorder(0, 5, 0, 5))); // T,L,B,R
 
-			/** For printing artikel-lists */
-			// System.out.println(((Category)
-			// categories.elementAt(i)).getNaam()+":");
-			// for (int j=0; j<((Category)
-			// categories.elementAt(i)).getNaam().length()+2;j++)
-			// System.out.print("-");
-			// System.out.println();
-
 			// speciale regeling voor leeggoed
-			if (i == idxCatEmpty) {
+			if (category.isLeeggoed()) {
 				helpPanels[i][0] = new JPanel(new GridLayout(aantalArtikels + 1, 1));
 				helpPanels[i][1] = new JPanel(new GridLayout(aantalArtikels + 1, 3));
 			} else {
@@ -236,7 +230,7 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 			sellCount[i] = new JTextField[aantalArtikels];
 
 			// extra labels voor het leeggoed
-			if (i == idxCatEmpty) {
+			if (category.isLeeggoed()) {
 				emptyMin = new JLabel("Terug");
 				emptyPlus = new JLabel("Betaald");
 				emptyMin.setHorizontalAlignment(JLabel.CENTER);
@@ -275,9 +269,8 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 				});
 				helpPanels[i][1].add(sellCount[i][j]);
 
-				// speciaal geval: leeggoed moet kunnen "verkocht" én
-				// teruggebracht worden.
-				if (i == idxCatEmpty) {
+				// speciaal geval: leeggoed moet kunnen "verkocht" Ã©n teruggebracht worden.
+				if (category.isLeeggoed()) {
 					emptyBack[j] = new JTextField();
 					emptyBack[j].setName(i + "-" + j);
 					emptyBack[j].setColumns(5);
@@ -299,24 +292,12 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 				if (collapseCategories) {
 					panels[i].closePanel();
 				}
-
-				/** For printing artikel-lists */
-				// System.out.println(art[j].getBeschrijving()+" ("+art[j].getPrijs()+HelpMethods.EURO+")");
 			}
-			/** For printing artikel-lists */
-			// System.out.println(Constants.NEWLINE);
 		}
 
 		// speciale regeling: artisanaat, geschenkbon (in & out), kortingsbon
 		panels[categories.size()] = new OxfamJPanel(new GridLayout(7, 2), this);
 		panels[categories.size()].setBorder(BorderFactory.createCompoundBorder(new ClickableTitledBorder("Artisanaat + bonnen"), BorderFactory.createEmptyBorder(0, 5, 0, 5))); // T,L,B,R
-
-		/** For printing artikel-lists */
-		// System.out.println(Constants.NEWLINE + "Totaal artisanaat");
-		// System.out.println("Totaal Amnesty & UNICEF");
-		// System.out.println("Verkochte geschenkbonnen");
-		// System.out.println("Ontvangen geschenkbonnen");
-		// System.out.println("Ontvangen kortingsbonnen");
 
 		artisanaat = new JLabel("Totaal artisanaat:");
 		artisanaat.setFont(new Font("Tahoma", 0, 12));
@@ -455,7 +436,7 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 	}
 
 	private JPanel createTotalPanel() {
-		// Weergave van totale som voor déze bestelling
+		// Weergave van totale som voor deze bestelling
 		JPanel totalPanel = new JPanel();
 		totalPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Totaal"), BorderFactory.createEmptyBorder(0, 5, 0, 5))); // T,L,B,R
 
@@ -507,11 +488,12 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 
 	public void reset() {
 		for (int i = 0; i < categories.size(); i++) {
-			List<Article> articles = categories.get(i).getArticles();
+			Category category = categories.get(i);
+			List<Article> articles = category.getArticles();
 			int aantalArtikels = articles.size();
 			for (int j = 0; j < aantalArtikels; j++) {
 				sellCount[i][j].setText("");
-				if (i == idxCatEmpty) {
+				if (category.isLeeggoed()) {
 					emptyBack[j].setText("");
 				}
 			}
@@ -534,7 +516,8 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 		boolean setBorderRed;
 
 		for (int i = 0; i < categories.size(); i++) {
-			List<Article> articles = categories.get(i).getArticles();
+			Category category = categories.get(i);
+			List<Article> articles = category.getArticles();
 
 			setBorderRed = false;
 
@@ -552,7 +535,7 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 				}
 
 				// verwerking teruggebracht leeggoed
-				if (i == idxCatEmpty) {
+				if (category.isLeeggoed()) {
 					count = 0;
 					try {
 						count = Integer.parseInt(emptyBack[j].getText());
@@ -675,7 +658,8 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 			order.reset();
 
 			for (int i = 0; i < categories.size(); i++) {
-				List<Article> articles = categories.get(i).getArticles();
+				Category category = categories.get(i);
+				List<Article> articles = category.getArticles();
 
 				for (int j = 0; j < articles.size(); j++) {
 					int count = 0;
@@ -687,7 +671,7 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 					order.addArticle(articles.get(j), count);
 
 					// verwerking teruggebracht leeggoed
-					if (i == idxCatEmpty) {
+					if (category.isLeeggoed()) {
 						count = 0;
 						try {
 							count = Integer.parseInt(emptyBack[j].getText());
@@ -781,24 +765,28 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 	}
 
 	public static void process(Order order) {
-		processOrderInDB(order);
+		logger.info("Processing order");
+		try {
+			database.processOrderInDB(order);
+		} catch (Exception e) {
+			logger.error("Failed to process order in DB", e);
+		}
+		logger.info("Order successfully processed in DB");
 		kassaAmount = HelpMethods.round(kassaAmount + order.getTotal());
 
 		inKassaLabel.setText(HelpMethods.toAmount(kassaAmount) + Constants.EURO);
 		aldreadySoldLabel.setText(HelpMethods.toAmount(kassaAmount - startAmount) + Constants.EURO);
 
 		totalOrder.add(order);
+		logger.info("Order added to dayTotal");
 
 		writeBackUp(totalOrder, programStart);
+		logger.info("Wrote backup");
 		programStart = false;
 
 		oxDB.reset();
 	}
 	
-	private static boolean isEmptyCategory(int categoryId) {
-		return idxCatEmpty == categoryId;
-	}
-
 	public static int getNbrOfArticles() {
 		return nbrOfArticles;
 	}
@@ -810,7 +798,7 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 			File file = new File(fileName);
 			Printer.printDayTotalToFile(totalOrder, file);
 		} catch (Exception e) {
-			System.err.println("Fout bij schrijven naar file: " + e);
+			logger.error("Fout bij schrijven naar file", e);
 		}
 	}
 
@@ -824,108 +812,4 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 		Printer.printToFile(order, oldBackup);
 	}
 
-	/** Reads data from DB */
-	private void readDB() {
-		try {
-			Connection connection = DriverManager.getConnection(PAR_JDBC_URL);
-			try {
-				Statement statement = connection.createStatement();
-				try {
-					ResultSet resultSet = statement.executeQuery("select * from Category");
-					while (resultSet.next()) {
-						int ID = resultSet.getInt("ID");
-						int BTW = resultSet.getInt("BTW");
-						String naam = resultSet.getString("Name");
-						if (naam.equals("Leeggoed")) {
-							idxCatEmpty = ID - 1;
-						}
-						categories.add(ID - 1, new Category(ID, BTW, naam));
-					}
-				} catch (Exception e) {
-					System.out.println("Fout bij inlezen van categoriën: " + e);
-				} finally {
-					statement.close();
-				}
-
-				statement = connection.createStatement();
-				try {
-					ResultSet resultSet = statement.executeQuery("select * from Article order by SortNumber");
-					while (resultSet.next()) {
-						int ID = resultSet.getInt("ID");
-						String description = resultSet.getString("Description");
-						String shortDescription = resultSet.getString("ShortDescription");
-						double price = resultSet.getDouble("Price");
-						int stock = resultSet.getInt("Stock");
-						int categoryID = resultSet.getInt("Category") - 1;
-						int BTW = categories.get(categoryID).getBTW();
-						Article art = new Article(ID, BTW, description, shortDescription, price, stock, categoryID);
-						categories.get(categoryID).addArticle(art);
-						nbrOfArticles++;
-					}
-				} catch (Exception e) {
-					System.out.println("Fout bij inlezen van artikels: " + e);
-				} finally {
-					statement.close();
-				}
-			} finally {
-				connection.close();
-			}
-		} catch (SQLException e) {
-			System.out.println("Foutje met databank zekerst?: " + e);
-			ExceptionFrame ef = new ExceptionFrame("Error", "Kon niets lezen uit de databank", this, false);
-			ef.setVisible(true);
-			enabled(false);
-		}
-	}
-
-    private static void processOrderInDB(Order order) {
-		try {
-			Connection conn = DriverManager.getConnection(PAR_JDBC_URL);
-			try {
-				PreparedStatement changeStock = conn.prepareStatement("update Article set Stock=? where ID=?");
-	   			try {
-			        for (Article article : order.getArticles()) {
-		        		//update stock in database
-	        			if (!isEmptyCategory(article.getCategory())) {
-	        				article.takeFromStock(order.getCount(article));
-		        			changeStock.setInt(1, article.getStock());
-		        			changeStock.setInt(2, article.getId());
-		        			changeStock.executeUpdate();
-		        		}
-		        	}
-				} catch (SQLException sqle) {
-					System.err.println("Fout bij aanpassen van stock: " + sqle);
-				} finally {
-					changeStock.close();
-				}
-			} catch (SQLException sqle) {
-				System.err.println("Problem occurred while trying to prepare a DB statement: " + sqle);
-	        } finally {
-	        	conn.close();
-	        }
-		} catch (SQLException sqle) {
-			System.err.println("Problem getting a connection to the DB: " + sqle);
-		}
-    } 
-
-	/** Resets stock for each article to 9999. */
-//	private void resetStock() {
-//		try {
-//			Connection connection = DriverManager.getConnection(PAR_JDBC_URL);
-//			PreparedStatement changeStock = null;
-//			try {
-//				changeStock = connection.prepareStatement("update Article set Stock=9999");
-//				changeStock.executeUpdate();
-//			} catch (Exception exp) {
-//				System.out.println("Fout bij aanpassen van stock: " + exp);
-//			} finally {
-//				if (changeStock != null) {
-//					changeStock.close();
-//				}
-//				connection.close();
-//			}
-//		} catch (SQLException exp) {
-//			System.out.println("Foutje met databank zekerst?: " + exp);
-//		}
-//	}
 }

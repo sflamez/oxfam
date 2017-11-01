@@ -13,13 +13,13 @@ public class Article implements Serializable {
 
 	private int id;
 	private int btw;
-	private int category;
 	private String description;
 	private String shortDescription;
 	private double price;
 	private int stock;
+	private Category category;
 	
-	public Article(int id, int btw, String description, String shortDescription, double price, int stock, int category) {
+	public Article(int id, int btw, String description, String shortDescription, double price, int stock, Category category) {
 		this.id = id;
 		this.btw = btw;
 		this.description = description;
@@ -53,7 +53,7 @@ public class Article implements Serializable {
 		return stock;
 	}
 	
-	public int getCategory() {
+	public Category getCategory() {
 		return category;
 	}
 	
