@@ -5,9 +5,8 @@ import java.awt.FontMetrics;
 import java.awt.Point;
 
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
-
-import sun.swing.SwingUtilities2;
 
 /**
  * @author Flamooze
@@ -29,7 +28,7 @@ public class ClickableTitledBorder extends TitledBorder {
 		textLoc.y = 1;
 		textLoc.x = 10;
 
-		int stringWidth = SwingUtilities2.stringWidth(jc, fm, getTitle());
+		int stringWidth = SwingUtilities.computeStringWidth(fm, getTitle());
 		int stringHeight = fm.getHeight();
 
 		return (p.getX() >= textLoc.x && p.getX() <= (textLoc.x + stringWidth) &&
