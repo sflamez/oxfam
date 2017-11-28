@@ -83,7 +83,7 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 	
 	// ---------- Variables ----------\\
 	private static boolean programStart, collapseCategories;
-	private static OxfamFrame oxDB;
+	private static OxfamFrame oxfamFrame;
 	private static List<Category> categories;
 	private static double startAmount, kassaAmount;
 	private static Order order, totalOrder;
@@ -97,7 +97,7 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 
 		this.addWindowListener(new WindowListener() {
 			public void windowClosing(WindowEvent e) {
-				StopFrame stopFrame = new StopFrame(oxDB);
+				StopFrame stopFrame = new StopFrame(oxfamFrame);
 				stopFrame.setVisible(true);
 				enabled(false);
 			}
@@ -185,12 +185,12 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 
 	private static void createAndShowGUI() {
 		// Create instance of OxfamFrame
-		oxDB = new OxfamFrame("Oxfam Wereldwinkel");
-		oxDB.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		oxfamFrame = new OxfamFrame("Oxfam Wereldwinkel");
+		oxfamFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
-		oxDB.pack();
-		oxDB.setLocation();
-		oxDB.setVisible(true);
+		oxfamFrame.pack();
+		oxfamFrame.setLocation();
+		oxfamFrame.setVisible(true);
 	}
 
 	public static void init(double amount, boolean collapse) {
@@ -784,7 +784,7 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 		logger.info("Wrote backup");
 		programStart = false;
 
-		oxDB.reset();
+		oxfamFrame.reset();
 	}
 	
 	public static int getNbrOfArticles() {

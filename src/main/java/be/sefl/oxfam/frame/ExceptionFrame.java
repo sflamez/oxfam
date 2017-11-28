@@ -19,13 +19,14 @@ public class ExceptionFrame extends MainFrame {
 	/** Button. */
 	private JButton okButton = new JButton("OK");
 
-	public ExceptionFrame(String title, String exception, MainFrame parent, boolean boxes) {
+	public ExceptionFrame(String title, Exception exception, MainFrame parent, boolean boxes) {
 		super(title, parent, boxes);
 		
-		exceptionLabel = new JLabel(exception);
+		exceptionLabel = new JLabel(exception.getMessage());
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.exit(1);
+				frame.remove();
+				parent.enabled(true);
 			}
 		});
 		

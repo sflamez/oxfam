@@ -58,11 +58,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.javapos</groupId>
-      <artifactId>javapos-controls</artifactId>
-      <version>1.9.1</version>
-    </dependency>
-    <dependency>
       <groupId>net.sf.ucanaccess</groupId>
       <artifactId>ucanaccess</artifactId>
       <version>4.0.2</version>

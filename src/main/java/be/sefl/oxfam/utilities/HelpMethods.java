@@ -12,7 +12,7 @@ public final class HelpMethods {
 	 * <p>Zet gegeven String (zowel met decimale komma als met decimaal punt)
 	 * om naar een double, eventueel afgerond tot 2 cijfers na de komma.</p>
 	 */
-	public static double parseStringToDouble(String s, boolean round) throws NumberFormatException {
+	public static Double parseStringToDouble(String s, boolean round) throws NumberFormatException {
 	    String doubleString = s.replace(',', '.');
 		return round? round(Double.parseDouble(doubleString)) : Double.parseDouble(doubleString);
 	}
@@ -20,7 +20,7 @@ public final class HelpMethods {
 	/**
 	 * <p>Rond een gegeven double af tot op 2 cijfers na de komma.</p>
 	 */
-	public static double round(double d) {
+	public static Double round(double d) {
 		return java.lang.Math.round(d*100.0)/100.0;
 	}
 	

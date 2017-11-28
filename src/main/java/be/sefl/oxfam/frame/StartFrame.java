@@ -9,14 +9,12 @@ import java.awt.event.WindowListener;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import be.sefl.oxfam.utilities.HelpMethods;
-import be.sefl.oxfam.utilities.PrintServer;
 
 /**
  * @author sefl
@@ -32,8 +30,6 @@ public class StartFrame extends MainFrame {
 	private ButtonGroup collapseCategories;
 	private JRadioButton collapseCategoriesNo;
 	private JRadioButton collapseCategoriesYes;
-
-	private JCheckBox isServer;
 
 	/** Buttons */
 	private JButton OK = new JButton("Start");
@@ -78,21 +74,12 @@ public class StartFrame extends MainFrame {
 		
 		this.addComponent(choice);
 
-		JLabel printServerLabel = new JLabel("Op PC met printer?");
-		printServerLabel.setFont(new Font("Tahoma", 0, 12));
-		this.addComponent(printServerLabel);
-		this.addComponent(this.isServer = new JCheckBox());
-
 		OK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!textField.getText().equals("")) {
 					startBedrag = HelpMethods.parseStringToDouble(textField.getText(),true);
 				} else {
 					startBedrag = 0.0;
-				}
-				System.setProperty("runsAsOxfamServer", String.valueOf(isServer.isSelected()));
-				if (isServer.isSelected()) {
-					new PrintServer().execute();
 				}
 
 				javax.swing.SwingUtilities.invokeLater(new Runnable() {

@@ -16,6 +16,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.sefl.oxfam.border.ClickableTitledBorder;
 import be.sefl.oxfam.constants.Constants;
 import be.sefl.oxfam.object.Article;
@@ -30,6 +33,8 @@ public class ConfirmOrderFrame extends MainFrame {
 
 	private static final long serialVersionUID = -2837528567624834445L;
 	
+    private static final Logger logger = LoggerFactory.getLogger("ConfirmOrderFrame");
+
 	//---------- Panels ----------\\
 	private JPanel arts;
 	private JPanel extras;
@@ -127,14 +132,14 @@ public class ConfirmOrderFrame extends MainFrame {
 		}
 		
 		OK.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent ae) {
 				OxfamFrame.process(order);
 				enableParent(true);
 				frame.remove();
 			}
 		});
 		nOK.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent ae) {
 				// Reset order, want na de wijzigingen wordt er opnieuw op 'Process'
 				// gedrukt en wordt deze order dus opnieuw aangemaakt.
 				order.reset();
@@ -143,15 +148,22 @@ public class ConfirmOrderFrame extends MainFrame {
 			}
 		});
 		change.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent ae) {
 				frame.enabled(false);
 				ChangeFrame cFrame = new ChangeFrame(order, frame);
 				cFrame.setVisible(true);
 			}
 		});
 		print.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Printer.print(order);
+			public void actionPerformed(ActionEvent ae) {
+				try {
+				    logger.info("Trying to print order");
+				    Printer.print(order);
+				} catch (Exception e) {
+					logger.error("Failed to print ticket", e);
+					frame.enabled(false);
+				    new ExceptionFrame("Failed to print ticket", e, frame, true).setVisible(true);
+				}
 			}
 		});
 
@@ -160,7 +172,7 @@ public class ConfirmOrderFrame extends MainFrame {
 		this.addControl(change);
 		this.addControl(print);
 
-		//How many articles can we show without using a scrollbar? -> numArts
+		// How many articles can we show without using a scrollbar? -> numArts
 		int rest = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight() -150 -196 -27;
 		int numArts = (int) Math.floor(rest/15.0);
 
