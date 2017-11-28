@@ -85,7 +85,7 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 	private static boolean programStart, collapseCategories;
 	private static OxfamFrame oxfamFrame;
 	private static List<Category> categories;
-	private static double startAmount, kassaAmount;
+	private static double startAmount, kassaAmount, alreadySoldAmount;
 	private static Order order, totalOrder;
 	private static Category emptyBottlesCategory;
 	private static int nbrOfArticles;
@@ -764,7 +764,7 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 		totalButton.setEnabled(false);
 	}
 
-	public static void process(Order order) {
+	public static void process(Order order, boolean bancontact) {
 		logger.info("Processing order");
 		try {
 			database.processOrderInDB(order);
@@ -772,15 +772,20 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 			logger.error("Failed to process order in DB", e);
 		}
 		logger.info("Order successfully processed in DB");
-		kassaAmount = HelpMethods.round(kassaAmount + order.getTotal());
 
-		inKassaLabel.setText(HelpMethods.toAmount(kassaAmount) + Constants.EURO);
-		aldreadySoldLabel.setText(HelpMethods.toAmount(kassaAmount - startAmount) + Constants.EURO);
+		alreadySoldAmount += order.getTotal();
+
+		if (!bancontact) {
+			kassaAmount = HelpMethods.round(kassaAmount + order.getTotal());
+			inKassaLabel.setText(HelpMethods.toAmount(kassaAmount) + Constants.EURO);
+		}
+
+		aldreadySoldLabel.setText(alreadySoldAmount + Constants.EURO);
 
 		totalOrder.add(order);
 		logger.info("Order added to dayTotal");
 
-		writeBackUp(totalOrder, programStart);
+		writeBackUp(totalOrder);
 		logger.info("Wrote backup");
 		programStart = false;
 
@@ -802,7 +807,7 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 		}
 	}
 
-	public static void writeBackUp(Order order, boolean programStart) {
+	private static void writeBackUp(Order order) {
 		File oldBackup = new File("Backup.txt");
 		if (programStart) {
 			oldBackup.renameTo(new File("Backup (" + HelpMethods.currentDateAndTimeToString() + ").txt"));
