@@ -12,11 +12,13 @@ import java.awt.event.FocusListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,6 +26,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.CompoundBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,7 +124,17 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 			}
 		});
 
-		database = new Database();
+		while (database == null) {
+			try {
+				database = new Database();
+			} catch (SQLException sqle) {
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setFileFilter(new FileNameExtensionFilter("Access Database (*.mdb)", "mdb"));
+				fileChooser.setDialogTitle("Kon de databank file niet vinden, gelieve zelf te selecteren.");
+				fileChooser.showOpenDialog(this);
+				tryToConnectToDB(fileChooser.getSelectedFile());
+			}
+		}
 
 		try {
 			categories = database.getCategories();
@@ -181,6 +194,15 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 		addControl(OKButton);
 		addControl(resetButton);
 		addControl(totalButton);
+	}
+
+	private void tryToConnectToDB(File file) {
+		try {
+			database = new Database(file);
+		} catch (SQLException e) {
+			
+		}
+		
 	}
 
 	private static void createAndShowGUI() {

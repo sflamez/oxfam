@@ -1,9 +1,11 @@
 package be.sefl.oxfam.utilities;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +16,25 @@ import be.sefl.oxfam.object.Order;
 
 public class Database {
 
-	private final static String PAR_FILE = "c:/OxfamDB.mdb";
-	private final static String PAR_JDBC_URL = "jdbc:ucanaccess://" + PAR_FILE;
+	private final static String PAR_JDBC_URL = "jdbc:ucanaccess://";
+
+	// Default to c:/OxfamDB.mdb
+	private String dbFile = "c:/OxfamDB.mdb";
+
+	public Database() throws SQLException {
+		// Test connection.
+		try (Connection connection = connect()) {
+			System.out.println("OK");
+		}
+	}
+
+	public Database(File file) throws SQLException {
+		// Test connection.
+		dbFile = file.getAbsolutePath();
+		try (Connection connection = connect()) {
+			System.out.println("OK");
+		}
+	}
 
 	/**
 	 * @return the categories from DB
@@ -78,8 +97,8 @@ public class Database {
 	public void resetStock() {
 	}
 
-	private Connection connect() throws Exception {
-		return DriverManager.getConnection(PAR_JDBC_URL);
+	private Connection connect() throws SQLException {
+		return DriverManager.getConnection(PAR_JDBC_URL + dbFile);
 	}
 
 }
