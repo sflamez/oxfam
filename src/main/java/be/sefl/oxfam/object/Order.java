@@ -23,6 +23,8 @@ public class Order implements Serializable {
 	private double[] extra;
 	private double amountToReturn;
 	private double amountPaid;
+	private boolean bancontact;
+	private double amountPaidWithBancontact;
 
 	public Order() {
 		count = new int[OxfamFrame.getNbrOfArticles()];
@@ -131,6 +133,10 @@ public class Order implements Serializable {
 		for (int i=0; i<extra.length; i++) {
 			extra[i] = HelpMethods.round(extra[i] + order.getExtra(i));
 		}
+
+		if (order.isPaidWithBancontact()) {
+			amountPaidWithBancontact += order.getTotal();
+		}
 	}
 	
 	public void addArticle(Article art, int size) {
@@ -154,22 +160,22 @@ public class Order implements Serializable {
 		this.amountToReturn = amountToReturn;
 	}
 	
+	public void paidWithBancontact() {
+		bancontact = true;
+	}
+
+	public boolean isPaidWithBancontact() {
+		return bancontact;
+	}
+
+	public double getAmountPaidWithBancontact() {
+		return amountPaidWithBancontact;
+	}
+
 	public int size() {
 		return articles.size();
 	}
 
-	public void reset() {
-		for (int i = 0; i < count.length; i++) {
-			count[i] = 0;
-		}
-		articles.clear();
-		for (int i = 0; i < extraS.length; i++) {
-			extra[i] = 0.0;
-		}
-		amountPaid = 0;
-		amountToReturn = 0;
-	}
-	
 	public String toString() {
 		String ret = "";
 		for (int i=0; i<articles.size(); i++) {

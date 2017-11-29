@@ -42,7 +42,7 @@ public class TicketCreator implements Serializable {
 		ticket.append(Constants.NEWLINE);
 
 		/** Begin listing Summary. */
-		ticket.append(generateSummary(order.getTotal(), order.getAmountPaid(), order.getAmountToReturn()));
+		ticket.append(generateSummary(order.getTotal(), order.getAmountPaid(), order.getAmountToReturn(), order.getAmountPaidWithBancontact()));
 
 		if (isTotal) {
 			ticket.append(generateTotalFooter(order.getTotals()));
@@ -95,7 +95,7 @@ public class TicketCreator implements Serializable {
 			goodbyeText += '*';
 		}
 
-		goodbyeText += ' ' + Constants.FOOTER_GOODBYE + ' ';
+		goodbyeText += '*' + Constants.FOOTER_GOODBYE + '*';
 
 		for (int i = 0; i < nbrOfStars + nbrOfExtraStars; i++) {
 			goodbyeText += '*';
@@ -125,12 +125,19 @@ public class TicketCreator implements Serializable {
 		return buffer.toString();
 	}
 
-	private static String generateSummary(double totalAmount, double paidAmount, double returnAmount) {
+	private static String generateSummary(double totalAmount, double paidAmount, double returnAmount, double amountPaidWithBancontact) {
 		StringBuffer buffer = new StringBuffer(Constants.MAX_CHARS);
 
 		buffer.append(Constants.LABEL_TOTAL);
 		buffer.append(StringFormatter.formatTotalAmount(HelpMethods.toAmount(totalAmount)));
 		buffer.append(Constants.NEWLINE);
+		
+		if (amountPaidWithBancontact != 0) {
+			buffer.append(Constants.NEWLINE);
+			buffer.append(Constants.LABEL_PAID_BY_BANCONTACT);
+			buffer.append(StringFormatter.formatTotalBancontactAmount(HelpMethods.toAmount(amountPaidWithBancontact)));
+			buffer.append(Constants.NEWLINE);
+		}
 
 		if (paidAmount != 0 && returnAmount != 0) {
 			buffer.append(Constants.LABEL_PAID);

@@ -87,6 +87,15 @@ public class StringFormatter {
 		return returnAmount;
 	}
 	
+	/** Returns a String of length MAX_PRICE. */
+	public static String formatTotalBancontactAmount(String totalBancontactAmount) {
+		while (totalBancontactAmount.length() < (Constants.MAX_CHARS - Constants.LABEL_PAID_BY_BANCONTACT.length())) {
+			totalBancontactAmount = ' ' + totalBancontactAmount;
+		}
+		
+		return totalBancontactAmount;
+	}
+	
 	/** Returns a String of MAX_CHAR stars.</p>
 	 */
 	public static String createStarLine() {

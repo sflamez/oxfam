@@ -138,7 +138,10 @@ public class ConfirmOrderFrame extends MainFrame {
 
 		OK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				OxfamFrame.process(order, bancontact.isSelected());
+				if (bancontact.isSelected()) {
+					order.paidWithBancontact();
+				}
+				OxfamFrame.process(order);
 				enableParent(true);
 				frame.remove();
 			}
@@ -147,7 +150,7 @@ public class ConfirmOrderFrame extends MainFrame {
 			public void actionPerformed(ActionEvent ae) {
 				// Reset order, want na de wijzigingen wordt er opnieuw op 'Process'
 				// gedrukt en wordt deze order dus opnieuw aangemaakt.
-				order.reset();
+				order = new Order();
 				enableParent(true);
 				frame.remove();
 			}

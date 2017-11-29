@@ -528,7 +528,7 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 			reductionProduct21Txt.setText("");
 		}
 
-		order.reset();
+		order = new Order();
 		updateTotalLabel();
 	}
 
@@ -677,7 +677,7 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == OKButton) {
-			order.reset();
+			order = new Order();
 
 			for (int i = 0; i < categories.size(); i++) {
 				Category category = categories.get(i);
@@ -780,13 +780,13 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 		writeTotal();
 		totalLabel.setText("Dagopbrengst: ");
 		totalAmountLabel.setText(HelpMethods.toAmount(totalOrder.getTotal()));
-		totalOrder.reset();
+		totalOrder = new Order();
 		OKButton.setEnabled(false);
 		resetButton.setEnabled(false);
 		totalButton.setEnabled(false);
 	}
 
-	public static void process(Order order, boolean bancontact) {
+	public static void process(Order order) {
 		logger.info("Processing order");
 		try {
 			database.processOrderInDB(order);
@@ -797,7 +797,7 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 
 		alreadySoldAmount += order.getTotal();
 
-		if (!bancontact) {
+		if (!order.isPaidWithBancontact()) {
 			kassaAmount = HelpMethods.round(kassaAmount + order.getTotal());
 			inKassaLabel.setText(HelpMethods.toAmount(kassaAmount) + Constants.EURO);
 		}
