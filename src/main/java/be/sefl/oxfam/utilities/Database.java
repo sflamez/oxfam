@@ -14,7 +14,7 @@ import be.sefl.oxfam.object.Order;
 
 public class Database {
 
-	private final static String PAR_FILE = "c:/Development/OxfamDB.mdb";
+	private final static String PAR_FILE = "c:/OxfamDB.mdb";
 	private final static String PAR_JDBC_URL = "jdbc:ucanaccess://" + PAR_FILE;
 
 	/**
