@@ -62,7 +62,8 @@ public final class HelpMethods {
 	 * <p>Berekent BTW van percentage % op bedrag amount.</p> 
 	 */
 	public static String calcBTW(int percentage, double amount) {
-		return toAmount(amount/100*percentage);
+		double amountWithoutBTW = amount / (1 + percentage / 100.0);
+		return toAmount(amountWithoutBTW/100*percentage);
 	}
 
 }

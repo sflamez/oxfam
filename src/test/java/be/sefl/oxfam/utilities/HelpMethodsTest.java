@@ -95,8 +95,8 @@ public class HelpMethodsTest {
 
 	@Test
 	public void testCalcBTW() {
-		assertEquals("6,00", HelpMethods.calcBTW(6, 100));
-		assertEquals("97,68", HelpMethods.calcBTW(21, 465.16));
+		assertEquals("13,90", HelpMethods.calcBTW(6, 245.50));
+		assertEquals("8,97", HelpMethods.calcBTW(21, 51.70));
 	}
 
 }
