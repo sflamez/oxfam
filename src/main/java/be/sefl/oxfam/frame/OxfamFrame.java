@@ -50,7 +50,11 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 	private static final long serialVersionUID = 7743524114756854696L;
 
 	private static final Logger logger = LoggerFactory.getLogger("OxfamFrame");
-	
+
+	private static final int PREFERRED_HEIGHT = 1024;
+
+	private static final int PREFERRED_WIDTH = 750;
+
 	// ---------- Panels ----------\\
 	private static JPanel mainPanel;
 	private static JPanel[] helpPanelsArti, helpPanelsAmni, helpPanelsGiftsOut,	helpPanelsGiftsIn, helpPanelsReduc;
@@ -210,9 +214,17 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 		oxfamFrame = new OxfamFrame("Oxfam Wereldwinkel");
 		oxfamFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
+		oxfamFrame.setPreferredSize(new Dimension(PREFERRED_WIDTH, PREFERRED_HEIGHT));
 		oxfamFrame.pack();
 		oxfamFrame.setLocation();
 		oxfamFrame.setVisible(true);
+	}
+
+	@Override
+	public void pack() {
+		// If the user resized the frame, set the current width and height as preferred.
+		setPreferredSize(new Dimension(getWidth(), getHeight()));
+		super.pack();
 	}
 
 	public static void init(double amount, boolean collapse) {
