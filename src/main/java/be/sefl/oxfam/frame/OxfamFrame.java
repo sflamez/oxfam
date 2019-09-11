@@ -223,7 +223,9 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 	@Override
 	public void pack() {
 		// If the user resized the frame, set the current width and height as preferred.
-		setPreferredSize(new Dimension(getWidth(), getHeight()));
+		if (getWidth() > PREFERRED_WIDTH || getHeight() > PREFERRED_HEIGHT) {
+			setPreferredSize(new Dimension(getWidth(), getHeight()));
+		}
 		super.pack();
 	}
 
