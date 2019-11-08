@@ -69,9 +69,10 @@ public class StartFrame extends MainFrame {
 		collapseCategories = new ButtonGroup();
 		collapseCategories.add(collapseCategoriesYes = new JRadioButton("Ja"));
 		collapseCategories.add(collapseCategoriesNo = new JRadioButton("Nee"));
+		collapseCategories.setSelected(collapseCategoriesNo.getModel(), true);
 		choice.add(collapseCategoriesYes);
 		choice.add(collapseCategoriesNo);
-		
+
 		this.addComponent(choice);
 
 		OK.addActionListener(new ActionListener() {
