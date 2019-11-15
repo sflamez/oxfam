@@ -19,6 +19,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +53,7 @@ public class ConfirmOrderFrame extends MainFrame {
 	private JButton print = new JButton("Print");
 
 	private JCheckBox bancontact = new JCheckBox("Bancontact?");
+	private JCheckBox payconiq = new JCheckBox("Payconiq?");
 
 	// ---------- Variables ----------\\
 	private List<Article> articles;
@@ -80,10 +83,10 @@ public class ConfirmOrderFrame extends MainFrame {
 		this.extras = new JPanel(new GridLayout(countExtras, 1));
 		this.extras.setBorder(createCompoundBorder(createTitledBorder("Artisanaat en bonnen"), createEmptyBorder(0, 5, 0, 5))); // T,L,B,R
 
-		this.total = new JPanel(new GridLayout(1, 2));
+		this.total = new JPanel(new GridLayout(1, 3));
 
 		/** Show amount paid and amount to return if available. */
-		if (orderToConfirm.getAmountToReturn() != 0.0) {
+		if (orderToConfirm.getAmountToReturn() != 0) {
 			total = new JPanel(new GridLayout(1, 3));
 		}
 
@@ -134,12 +137,33 @@ public class ConfirmOrderFrame extends MainFrame {
 			total.add(returnLabel);
 		} else {
 			total.add(bancontact);
+			total.add(payconiq);
 		}
+
+		// Bancontact and payconiq are mutually exclusive
+		bancontact.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
+				if (bancontact.isSelected()) {
+					payconiq.setSelected(false);
+				}
+			}
+		});
+		payconiq.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
+				if (payconiq.isSelected()) {
+					bancontact.setSelected(false);
+				}
+			}
+		});
 
 		OK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				if (bancontact.isSelected()) {
 					order.paidWithBancontact();
+				} else if (payconiq.isSelected()) {
+					order.paidWithPayconiq();
 				}
 				OxfamFrame.process(order);
 				enableParent(true);

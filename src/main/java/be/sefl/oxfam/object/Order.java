@@ -25,6 +25,8 @@ public class Order implements Serializable {
 	private double amountPaid;
 	private boolean bancontact;
 	private double amountPaidWithBancontact;
+	private boolean payconiq;
+	private double amountPaidWithPayconiq;
 
 	public Order() {
 		count = new int[OxfamFrame.getNbrOfArticles()];
@@ -136,6 +138,8 @@ public class Order implements Serializable {
 
 		if (order.isPaidWithBancontact()) {
 			amountPaidWithBancontact += order.getTotal();
+		} else if (order.isPaidWithPayconiq()) {
+			amountPaidWithPayconiq += order.getTotal();
 		}
 	}
 	
@@ -170,6 +174,22 @@ public class Order implements Serializable {
 
 	public double getAmountPaidWithBancontact() {
 		return amountPaidWithBancontact;
+	}
+
+	public void paidWithPayconiq() {
+		payconiq = true;
+	}
+
+	public boolean isPaidWithPayconiq() {
+		return payconiq;
+	}
+
+	public double getAmountPaidWithPayconiq() {
+		return amountPaidWithPayconiq;
+	}
+
+	public boolean isPaidCash() {
+		return !(bancontact || payconiq);
 	}
 
 	public int size() {

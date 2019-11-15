@@ -36,7 +36,8 @@ public class Constants {
 
 	public static final String LABEL_TOTAL = "TOTAAL";
 	public static final String LABEL_PAID = "Betaald";
-	public static final String LABEL_PAID_BY_BANCONTACT = "Betaald met bancontact";
+	public static final String LABEL_PAID_BY_BANCONTACT = "Betaald met Bancontact";
+	public static final String LABEL_PAID_BY_PAYCONIQ = "Betaald met Payconiq";
 	public static final String LABEL_RETURN = "Terug";
 	
 	public static final String NEWLINE = "\r\n";

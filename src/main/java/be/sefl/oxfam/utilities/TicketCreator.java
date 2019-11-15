@@ -42,7 +42,7 @@ public class TicketCreator implements Serializable {
 		ticket.append(Constants.NEWLINE);
 
 		/** Begin listing Summary. */
-		ticket.append(generateSummary(order.getTotal(), order.getAmountPaid(), order.getAmountToReturn(), order.getAmountPaidWithBancontact()));
+		ticket.append(generateSummary(order));
 
 		if (isTotal) {
 			ticket.append(generateTotalFooter(order.getTotals()));
@@ -63,7 +63,6 @@ public class TicketCreator implements Serializable {
 		buffer.append(Constants.NEWLINE);
 
 		buffer.append(StringFormatter.center(HelpMethods.currentDateAndTimeToString()));
-		buffer.append(Constants.NEWLINE);
 		buffer.append(Constants.NEWLINE);
 
 		return buffer.toString();
@@ -125,62 +124,56 @@ public class TicketCreator implements Serializable {
 		return buffer.toString();
 	}
 
-	private static String generateSummary(double totalAmount, double paidAmount, double returnAmount, double amountPaidWithBancontact) {
+	private static String generateSummary(Order order) {
 		StringBuffer buffer = new StringBuffer(Constants.MAX_CHARS);
 
-		buffer.append(Constants.LABEL_TOTAL);
-		buffer.append(StringFormatter.formatTotalAmount(HelpMethods.toAmount(totalAmount)));
-		buffer.append(Constants.NEWLINE);
-		
-		if (amountPaidWithBancontact != 0) {
-			buffer.append(Constants.NEWLINE);
-			buffer.append(Constants.LABEL_PAID_BY_BANCONTACT);
-			buffer.append(StringFormatter.formatTotalBancontactAmount(HelpMethods.toAmount(amountPaidWithBancontact)));
-			buffer.append(Constants.NEWLINE);
+		buffer.append(StringFormatter.createAmountLine(order.getTotal(), Constants.LABEL_TOTAL));
+
+		if (order.getAmountPaidWithBancontact() != 0) {
+			buffer.append(StringFormatter.createAmountLine(order.getAmountPaidWithBancontact(), Constants.LABEL_PAID_BY_BANCONTACT));
 		}
 
-		if (paidAmount != 0 && returnAmount != 0) {
-			buffer.append(Constants.LABEL_PAID);
-			buffer.append(StringFormatter.formatPaidAmount(HelpMethods.toAmount(paidAmount)));
-			buffer.append(Constants.NEWLINE);
+		if (order.getAmountPaidWithPayconiq() != 0) {
+			buffer.append(StringFormatter.createAmountLine(order.getAmountPaidWithPayconiq(), Constants.LABEL_PAID_BY_PAYCONIQ));
+		}
 
-			buffer.append(Constants.LABEL_RETURN);
-			buffer.append(StringFormatter.formatReturnAmount(HelpMethods.toAmount(returnAmount)));
-			buffer.append(Constants.NEWLINE);
+		if (order.getAmountPaid() != 0 && order.getAmountToReturn() != 0) {
+			buffer.append(StringFormatter.createAmountLine(order.getAmountPaid(), Constants.LABEL_PAID));
+			buffer.append(StringFormatter.createAmountLine(order.getAmountToReturn(), Constants.LABEL_RETURN));
 		}
 
 		return buffer.toString();
 	}
 
 	private static String generateArticleLine(Article article, int count) {
-		StringBuffer buffer = new StringBuffer(Constants.MAX_CHARS);
+		StringBuffer line = new StringBuffer(Constants.MAX_CHARS);
 
 		String name = article.getShortDescription();
 		double unitPrice = article.getPrice();
 
-		buffer.append(StringFormatter.formatDescription(name));
+		line.append(StringFormatter.formatDescription(name));
 
 		if (count == 1) {
-			buffer.append(StringFormatter.formatTotalPrice(HelpMethods.toAmount(unitPrice)));
+			line.append(StringFormatter.formatTotalPrice(HelpMethods.toAmount(unitPrice)));
 		} else {
-			buffer.append(Constants.NEWLINE);
-			buffer.append(StringFormatter.formatCount(count));
-			buffer.append(StringFormatter.formatUnitPrice(HelpMethods.toAmount(unitPrice)));
-			buffer.append(StringFormatter.formatTotalPrice(HelpMethods.toAmount(count * unitPrice)));
+			line.append(Constants.NEWLINE);
+			line.append(StringFormatter.formatCount(count));
+			line.append(StringFormatter.formatUnitPrice(HelpMethods.toAmount(unitPrice)));
+			line.append(StringFormatter.formatTotalPrice(HelpMethods.toAmount(count * unitPrice)));
 		}
-		buffer.append(Constants.NEWLINE);
+		line.append(Constants.NEWLINE);
 
-		return buffer.toString();
+		return line.toString();
 	}
 
 	private static String generateExtraLine(String extraName, double extraAmount) {
-		StringBuffer buffer = new StringBuffer(Constants.MAX_CHARS);
+		StringBuffer line = new StringBuffer(Constants.MAX_CHARS);
 
-		buffer.append(StringFormatter.formatDescription(extraName));
-		buffer.append(StringFormatter.formatTotalPrice(HelpMethods.toAmount(extraAmount)));
-		buffer.append(Constants.NEWLINE);
+		line.append(StringFormatter.formatDescription(extraName));
+		line.append(StringFormatter.formatTotalPrice(HelpMethods.toAmount(extraAmount)));
+		line.append(Constants.NEWLINE);
 
-		return buffer.toString();
+		return line.toString();
 	}
 
 	private static String generateTotalLine(int totalIndex, double amount) {
