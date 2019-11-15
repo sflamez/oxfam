@@ -44,13 +44,6 @@ public class StringFormatter {
 	}
 
 	/**
-	 * Returns a String of length MAX_PRICE.
-	 */
-	public static String formatAmount(double amount, String label) {
-		return padd(HelpMethods.toAmount(amount), Constants.MAX_CHARS - label.length());
-	}
-
-	/**
 	 * Prepends the string passed as param with spaces up to maxLength.
 	 */
 	private static String padd(String s, int maxLength) {
@@ -70,6 +63,16 @@ public class StringFormatter {
 			builder.append(' ');
 		}
 		return builder.toString();
+	}
+
+	/**
+	 * Returns a formatted line for the specified amount and it's corresponding label.
+	 */
+	public static String createAmountLine(double amount, String label) {
+		return new StringBuilder(label)
+				.append(padd(HelpMethods.toAmount(amount), Constants.MAX_CHARS - label.length()))
+				.append(Constants.NEWLINE)
+				.toString();
 	}
 
 	/**

@@ -34,23 +34,12 @@ public class StringFormatterTest {
     }
 
     @Test
-    public void formatTotalAmount() {
-        assertThat(StringFormatter.formatAmount(215.39, Constants.LABEL_TOTAL), equalTo("                                    215,39"));
-    }
-
-    @Test
-    public void formatPaidAmount() {
-        assertThat(StringFormatter.formatAmount(215.39, Constants.LABEL_PAID), equalTo("                                   215,39"));
-    }
-
-    @Test
-    public void formatReturnAmount() {
-        assertThat(StringFormatter.formatAmount(215.39, Constants.LABEL_RETURN), equalTo("                                     215,39"));
-    }
-
-    @Test
-    public void formatTotalBancontactAmount() {
-        assertThat(StringFormatter.formatAmount(215.39, Constants.LABEL_PAID_BY_BANCONTACT), equalTo("                    215,39"));
+    public void createAmountLine() {
+        assertThat(StringFormatter.createAmountLine(215.39, Constants.LABEL_TOTAL), equalTo(Constants.LABEL_TOTAL + "                                    215,39\r\n"));
+        assertThat(StringFormatter.createAmountLine(215.39, Constants.LABEL_PAID), equalTo(Constants.LABEL_PAID + "                                   215,39\r\n"));
+        assertThat(StringFormatter.createAmountLine(215.39, Constants.LABEL_RETURN), equalTo(Constants.LABEL_RETURN + "                                     215,39\r\n"));
+        assertThat(StringFormatter.createAmountLine(215.39, Constants.LABEL_PAID_BY_BANCONTACT), equalTo(Constants.LABEL_PAID_BY_BANCONTACT + "                    215,39\r\n"));
+        assertThat(StringFormatter.createAmountLine(215.39, Constants.LABEL_PAID_BY_PAYCONIQ), equalTo(Constants.LABEL_PAID_BY_PAYCONIQ + "                      215,39\r\n"));
     }
 
     @Test
