@@ -1,12 +1,12 @@
 package be.sefl.oxfam.object;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import be.sefl.oxfam.constants.Constants;
 import be.sefl.oxfam.frame.OxfamFrame;
 import be.sefl.oxfam.utilities.HelpMethods;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author sefl
@@ -15,7 +15,7 @@ public class Order implements Serializable {
 
 	private static final long serialVersionUID = 4011575444843477144L;
 
-	private static final String[] extraS = {"Artisanaat: ","Amnesty & UNICEF: ","Verkochte geschenkbonnen: ","Ontvangen geschenkbonnen: ","Ontvangen kortingsbonnen: ","Kortingsproduct (6% BTW): ","Kortingsproduct (21% BTW): "};
+	private static final String[] extraS = {"Artisanaat: ","Amnesty & UNICEF: ","Verkochte geschenkbonnen: ","Ontvangen geschenkbonnen: ","Ontvangen kortingsbonnen: ","Snelverkoop (6% BTW): ","Snelverkoop (21% BTW): "};
 	
 	//---------- Variables ----------\\
 	private int[] count;
@@ -92,8 +92,8 @@ public class Order implements Serializable {
 		total[0] += extra[2];		//Geschenkbonnen = 0% BTW
 		total[0] += extra[3];		//Geschenkbonnen = 0% BTW
 		total[0] += extra[4];		//Kortingsbonnen = 0% BTW
-		total[1] += extra[5];		//Kortingsproduct 6% BTW
-		total[2] += extra[6];		//Kortingsproduct 21% BTW
+		total[1] += extra[5];		//Snelverkoop 6% BTW
+		total[2] += extra[6];		//Snelverkoop 21% BTW
 		
 		for (int i = 0; i < 3; i++) {
 			total[i] = HelpMethods.round(total[i]);

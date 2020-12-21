@@ -1,36 +1,5 @@
 package be.sefl.oxfam.frame;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.io.File;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.border.CompoundBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import be.sefl.oxfam.border.ClickableTitledBorder;
 import be.sefl.oxfam.constants.Constants;
 import be.sefl.oxfam.constants.EuroLabel;
@@ -41,6 +10,22 @@ import be.sefl.oxfam.panel.OxfamJPanel;
 import be.sefl.oxfam.utilities.Database;
 import be.sefl.oxfam.utilities.HelpMethods;
 import be.sefl.oxfam.utilities.Printer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.File;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * @author sefl
@@ -345,9 +330,9 @@ public class OxfamFrame extends MainFrame implements ActionListener {
 		giftsIn.setFont(new Font("Tahoma", 0, 12));
 		reducBons = new JLabel("Ontvangen kortingsbonnen:");
 		reducBons.setFont(new Font("Tahoma", 0, 12));
-		reductionProduct6 = new JLabel("Kortingsproduct (6% BTW):");
+		reductionProduct6 = new JLabel("Snelverkoop (6% BTW):");
 		reductionProduct6.setFont(new Font("Tahoma", 0, 12));
-		reductionProduct21 = new JLabel("Kortingsproduct (21% BTW):");
+		reductionProduct21 = new JLabel("Snelverkoop (21% BTW):");
 		reductionProduct21.setFont(new Font("Tahoma", 0, 12));
 
 		artiTxt = new JTextField();
